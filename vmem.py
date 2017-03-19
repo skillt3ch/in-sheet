@@ -2,12 +2,12 @@
 
 import imaplib
 import email
-# import getpass
+import getpass
 import re
 
 SERVER = "outlook.office365.com"
-USER = "jonathan.vonkelaita@compnow.com.au"
-PASS = "bLueivY7361"
+USER = "email@company.com"
+PASS = getpass.getpass()
 
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(USER, PASS)
