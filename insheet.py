@@ -2,14 +2,12 @@
 
 import imaplib
 import email
-# import getpass
+import getpass
 import re
 
 SERVER = "outlook.office365.com"
 USER = "email@company.com"
-PASS = "passw0rd"
-
-
+PASS = getpass.getpass()
 
 # note that if you want to get text content (body) and the email contains
 # multiple payloads (plaintext/ html), you must parse each message separately.
@@ -33,45 +31,16 @@ def get_val(source, search):
 	 return new_msg[start:end]
 
 
-
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(USER, PASS)
 
-# print(mail.list())
-
 status, count = mail.select("INBOX")
 
-# result, data = mail.uid('search', None, "ALL")
-# latest_email_uid = data[0].split()[-1]
-# result, data = mail.uid('fetch', latest_email_uid, '(RFC822)')
 
-# raw_email = data[0][1]
-
-# print(data, latest_email_uid)
-
-# search for all emails containing the subject title "PO Numbers"
-# returns a 1 item array containing the list of UIDs of the emails which match the search string
-# e.g. [b'310 353 1093 3289']
-
-
-#result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
 result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
 
-
-# decode binary data to string
 id_list = data[0].split()
 latest_email_id = id_list[-1]
-
-"""
-result, data = mail.uid('fetch', latest_email_id, '(RFC822)')
-raw_email = data[0][1]
-
-email_message = email.message_from_string(raw_email)
-
-msg = get_first_text_block(email_message)
-subject = email_message['Subject']
-"""
-
 
 for uid in id_list:
 	result, data = mail.uid('fetch', uid, '(RFC822)')
@@ -138,32 +107,5 @@ for uid in id_list:
 
 	with open('Call - %s.html' % REQ, 'w') as file:
 		file.write(msg)
-		print '\nSuccessfully saved.\n\t>> Call - %s.html\n' % REQ, '*'*20, '\n'
-
-
-# print msg
-
-"""
-
-# iterate through each email UID
-for uid in data[0]:
-	# fetch current email
-	result, data = mail.uid('fetch', uid, "(RFC822)")
-	# grab raw email and convert to utf-8 encoded string
-	raw_email = data[0][1].decode('utf-8')
-	# parse to email object
-	email_message = email.message_from_string(raw_email)
-	# store body of email
-	msg = get_first_text_block(email_message)
 	
-	# print out message UID of each email
-	print("### Message UID: %s ###\nSubject: %s" % (uid, email_message['Subject']))
-
-	try:
-		with open('%s.html' % uid, 'w') as file:
-			file.write(msg)
-			print("Successfully wrote %s.html\n" % uid)
-	except:
-		print("Error writing file: %s.html\n" % uid)
-
-"""
+	print '\nSuccessfully saved.\n\t>> Call - %s.html\n\t>> %s-in.txt\n' % (REQ, REQ), '*'*20, '\n'
