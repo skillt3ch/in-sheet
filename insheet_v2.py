@@ -4,6 +4,7 @@ import imaplib
 import email
 import getpass
 import re
+import pdfkit
 
 SERVER = "outlook.office365.com"
 USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
@@ -29,7 +30,7 @@ def get_val(source, search):
 	 start = new_msg.find('</b>') + 5
 	 end = new_msg.find("</td>") - 1
 
-	 return new_msg[start:end].strip()
+	 return unicode(new_msg[start:end].strip(), errors='replace')
 
 
 mail = imaplib.IMAP4_SSL(SERVER)
@@ -83,7 +84,7 @@ for uid in id_list:
 	html = ''
 
 	saved_data = ''
-	saved_data += '<p><strong>Service Location</strong>: %s</p>' % LOCATION
+	#saved_data += '<p><strong>Service Location</strong>: %s</p>' % LOCATION
 	saved_data += '<p><strong>Organisation</strong>: %s</p>' % ORG
 	saved_data += '<p><strong>Contact</strong>: %s</p>' % CONTACT
 	saved_data += '<p><strong>Address</strong>: %s</p>' % ADDRESS
@@ -109,8 +110,19 @@ for uid in id_list:
 
 	html=html.replace("$REQ$", REQ).replace("$CONTACT$", CONTACT).replace("$ORG$", ORG).replace("$DATA$", saved_data)
 
-	with open('%s-in.html' % REQ, 'w') as insheet:
-		insheet.write(html)
+	options = {
+    'page-size': 'A4',
+    'margin-top': '1mm',
+    'margin-right': '1mm',
+    'margin-bottom': '0mm',
+    'margin-left': '1mm',
+    }
+
+	pdfkit.from_string(html, '%s-in.pdf' % REQ, options=options)
+
+
+	#with open('%s-in.html' % REQ, 'w') as insheet:
+	#	insheet.write(html)
 
 
 
@@ -127,4 +139,4 @@ for uid in id_list:
 		file.write(msg)
 	"""
 
-	print '\nSuccessfully saved.\n\t>> %s-in.html\n' % REQ, '*'*40, '\n'
+	print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % REQ, '*'*40, '\n'
