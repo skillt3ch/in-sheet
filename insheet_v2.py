@@ -8,7 +8,7 @@ import pdfkit
 
 SERVER = "outlook.office365.com"
 USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
-print "Username</strong>: %s" % USER
+print "Username: %s" % USER
 PASS = getpass.getpass()
 
 # note that if you want to get text content (body) and the email contains
@@ -60,7 +60,7 @@ for uid in id_list:
 	i = msg.find("No:")
 	REQ = msg[i+4:i+10]
 
-	print 'Web Request No</strong>: %s' % REQ
+	print 'Web Request No: %s' % REQ
 
 	LOCATION = get_val(msg, "Location:")
 	ORG = get_val(msg, "Organisation:")
