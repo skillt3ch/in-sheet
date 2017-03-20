@@ -6,7 +6,8 @@ import getpass
 import re
 
 SERVER = "outlook.office365.com"
-USER = "email@company.com"
+USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
+print "Username: %s" % USER
 PASS = getpass.getpass()
 
 # note that if you want to get text content (body) and the email contains
@@ -25,22 +26,24 @@ def get_val(source, search):
 	 i = source.find(search)
 	 new_msg = source[i:]
 
-	 start = new_msg.find('">') + 3
-	 end = new_msg.find("<o:p") - 1
+	 start = new_msg.find('</b>') + 5
+	 end = new_msg.find("</td>") - 1
 
-	 return new_msg[start:end]
+	 return new_msg[start:end].strip()
 
 
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(USER, PASS)
 
-status, count = mail.select("INBOX")
+status, count = mail.select("Service Requests")
+
+# print mail.list()
 
 
 result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
 
 id_list = data[0].split()
-latest_email_id = id_list[-1]
+# latest_email_id = id_list[-1]
 
 for uid in id_list:
 	result, data = mail.uid('fetch', uid, '(RFC822)')
