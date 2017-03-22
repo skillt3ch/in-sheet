@@ -4,6 +4,11 @@ import imaplib
 import email
 import getpass
 import re
+import pdfkit
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 SERVER = "outlook.office365.com"
 USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
@@ -29,7 +34,70 @@ def get_val(source, search):
 	 start = new_msg.find('</b>') + 5
 	 end = new_msg.find("</td>") - 1
 
-	 return new_msg[start:end].strip()
+	 return unicode(new_msg[start:end].strip(), errors='replace')
+
+def scrape_data(uid):
+	result, data = mail.uid('fetch', uid, '(RFC822)')
+	raw_email = data[0][1]
+
+	scraped = {}
+
+	email_message = email.message_from_string(raw_email)
+
+	msg = get_first_text_block(email_message)
+	subject = email_message['Subject']
+
+	print '*'*40, '\n', subject
+
+	i = msg.find("No:")
+	scraped['REQ'] = msg[i+4:i+10]
+
+	print 'Web Request No: %s' % scraped['REQ']
+
+	scraped['LOCATION'] = get_val(msg, "Location:")
+	scraped['ORG'] = get_val(msg, "Organisation:")
+	scraped['CONTACT'] = get_val(msg, "Contact:")
+	scraped['ADDRESS'] = get_val(msg, "Address:")
+	scraped['EMAIL'] = get_val(msg, "Email:")
+	scraped['CONTACT_NUM'] = get_val(msg, "Contact Number:")
+	scraped['MODEL'] = get_val(msg, "Model:")
+	scraped['SERIAL'] = get_val(msg, "Serial:")
+	scraped['EXTRA'] = get_val(msg, "Accessories:")
+	scraped['FAULT'] = get_val(msg, "Repair Required:")
+	scraped['DAMAGE'] = get_val(msg, "Damage:")
+	scraped['PREV_REPAIR'] = get_val(msg, "Repaired:")
+	scraped['BACKUP'] = get_val(msg, "Backup:")
+	scraped['FMI'] = get_val(msg, "Find My iPhone:")
+	scraped['REPAIR_TYPE'] = get_val(msg, "Repair Type:")
+	scraped['RETURN_GOODS'] = get_val(msg, "Return of Goods:")
+	scraped['AGREED'] = get_val(msg, "Service Terms:")
+	scraped['REQ_DATE_TIME'] = get_val(msg, "Time of Request:")
+
+	saved_data = ''
+	#saved_data += '<p><strong>Service Location</strong>: %s</p>' % LOCATION
+	saved_data += '<p><strong>Organisation</strong>: %s</p>' % scraped['ORG']
+	saved_data += '<p><strong>Contact</strong>: %s</p>' % scraped['CONTACT']
+	saved_data += '<p><strong>Address</strong>: %s</p>' % scraped['ADDRESS']
+	saved_data += '<p><strong>Email</strong>: %s</p>' % scraped['EMAIL']
+	saved_data += '<p><strong>Contact Number</strong>: %s</p>' % scraped['CONTACT_NUM']
+	saved_data += '<p><strong>Brand/Model</strong>: %s</p>' % scraped['MODEL']
+	saved_data += '<p><strong>Serial Number</strong>: %s</p>' % scraped['SERIAL']
+	saved_data += '<p><strong>Extra Accessories</strong>: %s</p>' % scraped['EXTRA']
+	saved_data += '<p><strong>Fault/Repair Required</strong>: %s</p>' % scraped['FAULT']
+	saved_data += '<p><strong>Visible Damage</strong>: %s</p>' % scraped['DAMAGE']
+	saved_data += '<p><strong>Previously Repaired</strong>: %s</p>' % scraped['PREV_REPAIR']
+	saved_data += '<p><strong>Data Backup</strong>: %s</p>' % scraped['BACKUP']
+	saved_data += '<p><strong>Find My iPhone</strong>: %s</p>' % scraped['FMI']
+	saved_data += '<p><strong>Service Repair Type</strong>: %s</p>' % scraped['REPAIR_TYPE']
+	saved_data += '<p><strong>Return of Goods</strong>: %s</p>' % scraped['RETURN_GOODS']
+	saved_data += '<p><strong>Agreed to Service Terms</strong>: %s</p>' % scraped['AGREED']
+	saved_data += '<p><strong>Date/Time of Request</strong>: %s</p>' % scraped['REQ_DATE_TIME']
+
+	saved_data.replace("\\r\\n", "")
+
+	scraped['saved_data'] = saved_data
+
+	return scraped
 
 
 mail = imaplib.IMAP4_SSL(SERVER)
@@ -46,69 +114,42 @@ id_list = data[0].split()
 # latest_email_id = id_list[-1]
 
 for uid in id_list:
-	result, data = mail.uid('fetch', uid, '(RFC822)')
-	raw_email = data[0][1]
 
-	email_message = email.message_from_string(raw_email)
+	try:
+		scraped = scrape_data(uid)
 
-	msg = get_first_text_block(email_message)
-	subject = email_message['Subject']
+		with open('printtest.html', 'r') as htmlFile:
+			html = htmlFile.read()
 
-	print '*'*20, '\n', subject
+		html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
 
-	i = msg.find("No:")
-	REQ = msg[i+4:i+10]
+		options = {
+		'page-size': 'A4',
+		'margin-top': '5mm',
+		'margin-right': '2mm',
+		'margin-bottom': '0mm',
+		'margin-left': '2mm',
+		}
 
-	print 'Web Request No: %s' % REQ
+		pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
 
-	LOCATION = get_val(msg, "Location:")
-	ORG = get_val(msg, "Organisation:")
-	CONTACT = get_val(msg, "Contact:")
-	ADDRESS = get_val(msg, "Address:")
-	EMAIL = get_val(msg, "Email:")
-	CONTACT_NUM = get_val(msg, "Contact Number:")
-	MODEL = get_val(msg, "Model:")
-	SERIAL = get_val(msg, "Serial:")
-	EXTRA = get_val(msg, "Accessories:")
-	FAULT = get_val(msg, "Repair Required:")
-	DAMAGE = get_val(msg, "Damage:")
-	PREV_REPAIR = get_val(msg, "Repaired:")
-	BACKUP = get_val(msg, "Backup:")
-	FMI = get_val(msg, "Find My iPhone:")
-	REPAIR_TYPE = get_val(msg, "Repair Type:")
-	RETURN_GOODS = get_val(msg, "Return of Goods:")
-	AGREED = get_val(msg, "Service Terms:")
-	REQ_DATE_TIME = get_val(msg, "Time of Request:")
+		with open('Call - %s.html' % scraped['REQ'], 'w') as file:
+			file.write(html)
 
+		print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % scraped['REQ'], '*'*40, '\n'
 
-	saved_data = ''
-	saved_data += 'Service Location: %s\n' % LOCATION
-	saved_data += 'Organisation: %s\n' % ORG
-	saved_data += 'Contact: %s\n' % CONTACT
-	saved_data += 'Address: %s\n' % ADDRESS
-	saved_data += 'Email: %s\n' % EMAIL
-	saved_data += 'Contact Number: %s\n' % CONTACT_NUM
-	saved_data += 'Brand/Model: %s\n' % MODEL
-	saved_data += 'Serial Number: %s\n' % SERIAL
-	saved_data += 'Extra Accessories: %s\n' % EXTRA
-	saved_data += 'Fault/Repair Required: %s\n' % FAULT
-	saved_data += 'Visible Damage: %s\n' % DAMAGE
-	saved_data += 'Previously Repaired: %s\n' % PREV_REPAIR
-	saved_data += 'Data Backup: %s\n' % BACKUP
-	saved_data += 'Find My iPhone: %s\n' % FMI
-	saved_data += 'Service Repair Type: %s\n' % REPAIR_TYPE
-	saved_data += 'Return of Goods: %s\n' % RETURN_GOODS
-	saved_data += 'Agreed to Service Terms: %s\n' % AGREED
-	saved_data += 'Date/Time of Request: %s' % REQ_DATE_TIME
+		#with open('%s-in.html' % REQ, 'w') as insheet:
+		#	insheet.write(html)
 
-	saved_data = saved_data.replace("\\r\\n", "")
+		print scraped['saved_data']
 
-	print saved_data
+		"""
 
-	with open('%s-in.txt' % REQ, 'w') as file:
-		file.write(saved_data)
+		with open('%s-in.txt' % REQ, 'w') as file:
+			file.write(saved_data)
 
-	with open('Call - %s.html' % REQ, 'w') as file:
-		file.write(msg)
+		"""
+	except:
+		print 'Error: skipping....'
+
 	
-	print '\nSuccessfully saved.\n\t>> Call - %s.html\n\t>> %s-in.txt\n' % (REQ, REQ), '*'*20, '\n'
