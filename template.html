@@ -11,26 +11,57 @@
         <style>
             @page {
                 size: A4;
-                margin: 1cm;
+                margin: 0;
+                padding: 0;
             }
 
             body {
-                margin: auto;
+                width: 21cm;
+                min-height: 29.7cm;
+                margin: 0;
+                padding: 0px 10px 0px 0px;
+                font-family: sans-serif;
+                border-bottom: none;
+                border-color: red;
             }
 
             .grid-container {
-                width: 100%;
-                height: 100%;
-                padding: 12px;
+                width: 21cm;
+                min-height: 29.7cm;
+                padding: 0px 10px 0px 0px;
             }
 
             .header {
-                padding: 20px;
+                padding: 20px 20px;
                 text-align: center;
                 background-color: #A8C148;
-                height: 15%;
+                height: 3cm;
             }
-
+            
+            .contact {
+                background-color: #eee;
+                height: 10%;
+                text-align: center;
+                height: 3cm;
+                padding-bottom: 10px;
+            }
+            
+            .data {
+                padding: 10px 20px;
+                font-size: 15px;
+                height: 17.7cm;
+            }
+            
+            .footer {
+                background-color: #A8C148;
+                height: 3.5cm;
+                padding: 10px 0px 12px 0px;
+            }
+            
+            .row {
+                padding: 12px 0px;                
+            }
+            
             .row:before,
             .row:after {
                 content: "";
@@ -45,56 +76,50 @@
             }
 
             .col-1 {
-                width: 16.66%;
+                width: 16%;
             }
             .col-2 {
-                width: 33.33%;
+                width: 33%;
             }
             .col-3 {
                 width: 50%;
             }
             .col-4 {
-                width: 66.664%;
+                width: 66%;
             }
             .col-5 {
-                width: 83.33%;
+                width: 83%;
             }
             .col-6 {
                 width: 100%;
             }
-
-            .contact {
-                height: 10%;
+            
+            .center {
                 text-align: center;
             }
 
-            .barcode {
-                border-left-style: groove;
-                text-align: right;
-            }
-
             #barcode {
+                font-size: 60px;
+                font-weight: 100;
                 font-family: New;
-                font-size: 24px;
-                margin-left: 10px;
-                padding-left: 10px;
+                text-align: center;
+                margin: 0px;
+                padding: 1px 0px;
             }
 
-            .data {
-                padding: 20px;
-                font-size: 16px;
-                height: 50%;
+            #job-number {
+                padding: 20px 0px;
             }
-
-            .footer {
-                background-color: #A8C148;
-                padding: 10px;
-                height: 20%;
+            
+            .padded {
+                text-align: left;
+                margin: 0px;
+                padding: 10px 0px 10px 20px;
             }
 
             img {
-                width: 80px;
-                height: 80px;
+                width: 100px;
+                height: 100px;
                 border-radius: 5%;
                 border-width: 1px;
                 border-style: solid;
@@ -108,7 +133,7 @@
                     <div class="col-1" id="companyLogo">
                         <img src="http://services.compnow.com.au/customer_portal/email/img/compnow_square.png" alt="CompNow Logo" />
                     </div>
-                    <div class="col-5" id="jobNumber">
+                    <div class="col-5" id="job-number">
                         <h1>Service Request No: $REQ$</h1>
                     </div>
                 </div>
@@ -128,11 +153,11 @@
 
             <div class="footer">
                 <div class="row">
-                    <div class="col-4 textLabel">
-                        <h3>$ORG$</h3>
-                        <h3>$CONTACT$</h3>
+                    <div class="col-4">
+                        <h2 class="padded">$ORG$</h2>
+                        <h2 class="padded">$CONTACT$</h2>
                     </div>
-                    <div class="col-1 barcode">
+                    <div class="col-2 center">
                         <h2>$REQ$</h2>
                         <h2 id="barcode">*$REQ$*</h2>
                     </div>
