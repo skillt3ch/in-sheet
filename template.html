@@ -1,79 +1,140 @@
 <!DOCTYPE html>
 <html>
-    <style>
-        .header {
-            margin: auto;
-            width: 100%;
-            padding: 20px;
-            text-align: center;
-            background-color: #A8C148;
-        }
-        
-        .contact {
-            text-align: center;
-        }
-        
-        .barcode {
-            border-left-style: groove;
-            text-align: right;
-        }
-        
-        .data {
-            font-size: 20px;
-            margin: 5px;
-            padding: 15px;
-            height: 600px;
-        }
-        
-        .footer {
-            background-color: #A8C148;
-            margin: 5px;
-            padding: 15px;
-        }
-        
-        img {
-            width: 100px;
-            height: 100px;
-        }
-    </style>
+
     <head>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+
+        <!--
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+-->
+        <style>
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+
+            body {
+                margin: auto;
+            }
+
+            .grid-container {
+                width: 100%;
+                height: 100%;
+                padding: 12px;
+            }
+
+            .header {
+                padding: 20px;
+                text-align: center;
+                background-color: #A8C148;
+                height: 15%;
+            }
+
+            .row:before,
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            [class*='col-'] {
+                float: left;
+                min-height: 1px;
+                width: 16.66%;
+            }
+
+            .col-1 {
+                width: 16.66%;
+            }
+            .col-2 {
+                width: 33.33%;
+            }
+            .col-3 {
+                width: 50%;
+            }
+            .col-4 {
+                width: 66.664%;
+            }
+            .col-5 {
+                width: 83.33%;
+            }
+            .col-6 {
+                width: 100%;
+            }
+
+            .contact {
+                height: 10%;
+                text-align: center;
+            }
+
+            .barcode {
+                border-left-style: groove;
+                text-align: right;
+            }
+
+            #barcode {
+                font-family: New;
+                font-size: 24px;
+                margin-left: 10px;
+                padding-left: 10px;
+            }
+
+            .data {
+                padding: 20px;
+                font-size: 16px;
+                height: 50%;
+            }
+
+            .footer {
+                background-color: #A8C148;
+                padding: 10px;
+                height: 20%;
+            }
+
+            img {
+                width: 80px;
+                height: 80px;
+                border-radius: 5%;
+                border-width: 1px;
+                border-style: solid;
+            }
+        </style>
     </head>
     <body>
-        <div class="container-fluid">
+        <div class="grid-container">
             <div class="header">
                 <div class="row">
-                    <div class="col-xs-3" id="companyLogo">
+                    <div class="col-1" id="companyLogo">
                         <img src="http://services.compnow.com.au/customer_portal/email/img/compnow_square.png" alt="CompNow Logo" />
                     </div>
-                    <div class="col-xs-9" id="jobNumber">
+                    <div class="col-5" id="jobNumber">
                         <h1>Service Request No: $REQ$</h1>
                     </div>
                 </div>
             </div>
             <div class="contact">
                 <div class="row">
-                    <div class="col-xs-12" id="contact">
+                    <div class="col-6" id="contact">
                         <h2>$ORG$</h2>
                         <h3>$CONTACT$</h3>
                     </div>
                 </div>
             </div>
-            
+
             <div class="data">
                 $DATA$
             </div>
-            
+
             <div class="footer">
                 <div class="row">
-                    <div class="col-xs-7 textLabel">
+                    <div class="col-4 textLabel">
                         <h3>$ORG$</h3>
                         <h3>$CONTACT$</h3>
                     </div>
-                    <div class="col-xs-5 barcode">
+                    <div class="col-1 barcode">
                         <h2>$REQ$</h2>
-                        <h2>*$REQ$*</h2>
+                        <h2 id="barcode">*$REQ$*</h2>
                     </div>
                 </div>            
             </div>

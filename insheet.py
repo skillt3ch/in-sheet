@@ -4,7 +4,7 @@ import imaplib
 import email
 import getpass
 import re
-import pdfkit
+import weasyprint
 import sys
 
 reload(sys)
@@ -95,7 +95,7 @@ def scrape_data(uid):
 	saved_data += '<p><strong>Agreed to Service Terms</strong>: %s</p>' % scraped['AGREED']
 	saved_data += '<p><strong>Date/Time of Request</strong>: %s</p>' % scraped['REQ_DATE_TIME']
 
-	saved_data.replace("\\r\\n", "")
+	saved_data.replace("\\r\\n", "").replace("\\", "")
 
 	scraped['saved_data'] = saved_data
 
@@ -122,13 +122,13 @@ for uid in id_list:
 
 		html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
 
-		#doc = weasyprint.HTML(string=html)
-		#pdf = doc.write_pdf()
+		doc = weasyprint.HTML(string=html)
+		pdf = doc.write_pdf()
 
-		#with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
-		#	pdfFile.write(pdf)
+		with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
+			pdfFile.write(pdf)
 
-		pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
+		#pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
 
 		#with open('Call - %s.html' % scraped['REQ'], 'w') as file:
 		#	file.write(html)
