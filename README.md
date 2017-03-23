@@ -3,7 +3,7 @@ Scrapes inbox for web service requests and pulls all the data.
 Using a HTML template (*template.html*), a new HTML document is populated with the scraped data from the email.
 The HTML is then converted to PDF using **weasyprint**.
 
-## Todo:
+## To Do:
 
 * Add command line arguments to enable extra functionality:
 	* Create new in-sheet for a single job number
