@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        .header {
+            margin: auto;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background-color: #A8C148;
+        }
+        
+        .contact {
+            text-align: center;
+        }
+        
+        .barcode {
+            border-left-style: groove;
+            text-align: right;
+        }
+        
+        .data {
+            font-size: 20px;
+            margin: 5px;
+            padding: 15px;
+            height: 600px;
+        }
+        
+        .footer {
+            background-color: #A8C148;
+            margin: 5px;
+            padding: 15px;
+        }
+        
+        img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+    <head>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="header">
+                <div class="row">
+                    <div class="col-xs-3" id="companyLogo">
+                        <img src="http://services.compnow.com.au/customer_portal/email/img/compnow_square.png" alt="CompNow Logo" />
+                    </div>
+                    <div class="col-xs-9" id="jobNumber">
+                        <h1>Service Request No: $REQ$</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="contact">
+                <div class="row">
+                    <div class="col-xs-12" id="contact">
+                        <h2>$ORG$</h2>
+                        <h3>$CONTACT$</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data">
+                $DATA$
+            </div>
+            
+            <div class="footer">
+                <div class="row">
+                    <div class="col-xs-7 textLabel">
+                        <h3>$ORG$</h3>
+                        <h3>$CONTACT$</h3>
+                    </div>
+                    <div class="col-xs-5 barcode">
+                        <h2>$REQ$</h2>
+                        <h2>*$REQ$*</h2>
+                    </div>
+                </div>            
+            </div>
+
+        </div>
+
+
+    </body>
+
+</html>

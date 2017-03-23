@@ -15,6 +15,8 @@ USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
 print "Username: %s" % USER
 PASS = getpass.getpass()
 
+TEMPLATE = "template.html"
+
 # note that if you want to get text content (body) and the email contains
 # multiple payloads (plaintext/ html), you must parse each message separately.
 # use something like the following: (taken from a stackoverflow post)
@@ -105,9 +107,6 @@ mail.login(USER, PASS)
 
 status, count = mail.select("Service Requests")
 
-# print mail.list()
-
-
 result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
 
 id_list = data[0].split()
@@ -118,38 +117,33 @@ for uid in id_list:
 	try:
 		scraped = scrape_data(uid)
 
-		with open('printtest.html', 'r') as htmlFile:
+		with open(TEMPLATE, 'r') as htmlFile:
 			html = htmlFile.read()
 
 		html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
 
-		options = {
-		'page-size': 'A4',
-		'margin-top': '5mm',
-		'margin-right': '2mm',
-		'margin-bottom': '0mm',
-		'margin-left': '2mm',
-		}
+		#doc = weasyprint.HTML(string=html)
+		#pdf = doc.write_pdf()
+
+		#with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
+		#	pdfFile.write(pdf)
 
 		pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
 
-		with open('Call - %s.html' % scraped['REQ'], 'w') as file:
-			file.write(html)
+		#with open('Call - %s.html' % scraped['REQ'], 'w') as file:
+		#	file.write(html)
 
 		print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % scraped['REQ'], '*'*40, '\n'
 
-		#with open('%s-in.html' % REQ, 'w') as insheet:
-		#	insheet.write(html)
-
-		print scraped['saved_data']
-
 		"""
+		with open('%s-in.html' % scraped['REQ'], 'w') as insheet:
+			insheet.write(html)
 
-		with open('%s-in.txt' % REQ, 'w') as file:
+		 print scraped['saved_data']
+
+		
+		with open('%s-in.txt' % scraped['REQ'], 'w') as file:
 			file.write(saved_data)
-
 		"""
 	except:
 		print 'Error: skipping....'
-
-	
