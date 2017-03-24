@@ -3,6 +3,29 @@ Scrapes inbox for web service requests and pulls all the data.
 Using a HTML template (*template.html*), a new HTML document is populated with the scraped data from the email.
 The HTML is then converted to PDF using **weasyprint**.
 
+
+## Requirements:
+
+### Use pip to install:
+
+#### weasyprint
+```bash
+pip install weasyprint
+```
+### Use HomeBrew to install:
+
+#### cairo
+
+```bash
+brew install cairo
+```
+
+#### pango
+
+```bash
+brew install pango
+````
+
 ## Instructions:
 
 ### Usage
