@@ -30,5 +30,5 @@ insheet.py -u johnsmith -j 703803
 	* ~~Create new in-sheet for a single job number~~
 	* Choose which mailbox to search (*'Service Requests' / 'Service Requests DONE', 'INBOX', etc.*)
 	* ~~Choose which email account to log in as (currently hardcoded)~~
-* Add comments to code
+* ~~Add comments to code~~
 * Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
