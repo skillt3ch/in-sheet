@@ -6,16 +6,10 @@ import getpass
 import re
 import weasyprint
 import sys
+import getopt
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-SERVER = "outlook.office365.com"
-USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
-print "Username: %s" % USER
-PASS = getpass.getpass()
-
-TEMPLATE = "template.html"
 
 # note that if you want to get text content (body) and the email contains
 # multiple payloads (plaintext/ html), you must parse each message separately.
@@ -38,7 +32,7 @@ def get_val(source, search):
 
 	 return unicode(new_msg[start:end].strip(), errors='replace')
 
-def scrape_data(uid):
+def scrape_data(mail, uid):
 	result, data = mail.uid('fetch', uid, '(RFC822)')
 	raw_email = data[0][1]
 
@@ -101,49 +95,73 @@ def scrape_data(uid):
 
 	return scraped
 
+def main(argv):
 
-mail = imaplib.IMAP4_SSL(SERVER)
-mail.login(USER, PASS)
+	#print "Number of arguments: %s" % len(argv)
+	#print "Arguments: %s" % str(argv)
 
-status, count = mail.select("Service Requests")
-
-result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
-
-id_list = data[0].split()
-# latest_email_id = id_list[-1]
-
-for uid in id_list:
+	SERVER = "outlook.office365.com"
+	USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
+	JOB_NO = 0
 
 	try:
-		scraped = scrape_data(uid)
+		opts, args = getopt.getopt(argv, "u:j:h")
+	except getopt.GetoptError:
+		print "insheet.py -u <username> [-j <job number>]"
 
-		with open(TEMPLATE, 'r') as htmlFile:
-			html = htmlFile.read()
+	for opt, arg in opts:
+		if opt == "-h":
+			print "insheet.py -u <username> [-j <job number>]"
+			sys.exit()
+		elif opt == "-j":
+			JOB_NO = arg
+		elif opt == "-u":
+			USER = arg + "@compnow.com.au/servicevic@compnow.com.au"
 
-		html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
+	print "Job Number:", JOB_NO
+	print "Username:", USER
+	PASS = getpass.getpass()
 
-		doc = weasyprint.HTML(string=html)
-		pdf = doc.write_pdf()
+	TEMPLATE = "template.html"
 
-		with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
-			pdfFile.write(pdf)
+	mail = imaplib.IMAP4_SSL(SERVER)
+	mail.login(USER, PASS)
 
-		#pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
+	status, count = mail.select("Service Requests")
 
-		#with open('Call - %s.html' % scraped['REQ'], 'w') as file:
-		#	file.write(html)
+	if JOB_NO == 0:
+		result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
+	else:
+		result, data = mail.uid('search', None, '(BODY "Request No: %s")' % JOB_NO)
 
-		print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % scraped['REQ'], '*'*40, '\n'
+	id_list = data[0].split()
+	# latest_email_id = id_list[-1]
 
-		"""
-		with open('%s-in.html' % scraped['REQ'], 'w') as insheet:
-			insheet.write(html)
+	for uid in id_list:
 
-		 print scraped['saved_data']
+		try:
+			scraped = scrape_data(mail, uid)
 
-		
-		with open('%s-in.txt' % scraped['REQ'], 'w') as file:
-			file.write(saved_data)
-		"""
-	except:
-		print 'Error: skipping....'
+			with open(TEMPLATE, 'r') as htmlFile:
+				html = htmlFile.read()
+
+			html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
+
+			doc = weasyprint.HTML(string=html)
+			pdf = doc.write_pdf()
+
+			with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
+				pdfFile.write(pdf)
+
+			#pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
+
+			#with open('Call - %s.html' % scraped['REQ'], 'w') as file:
+			#	file.write(html)
+
+			print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % scraped['REQ'], '*'*40, '\n'
+
+		except Exception as e:
+			print 'Error: %s' % e
+
+
+main(sys.argv[1:])
