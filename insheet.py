@@ -107,11 +107,11 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv, "u:j:h")
 	except getopt.GetoptError:
-		print "insheet.py -u <username> [-j <job number>]"
+		print "insheet.py [-u <username>] [-j <job number>]"
 
 	for opt, arg in opts:
 		if opt == "-h":
-			print "insheet.py -u <username> [-j <job number>]"
+			print "insheet.py [-u <username>] [-j <job number>]"
 			sys.exit()
 		elif opt == "-j":
 			JOB_NO = arg
