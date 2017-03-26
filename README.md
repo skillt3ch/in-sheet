@@ -31,9 +31,9 @@ insheet.py -u johnsmith -j 703803 -f sd
 
 ## To Do:
 
-[X] Add command line arguments to enable extra functionality:
-	[X] Create new in-sheet for a single job number
-	[X] Choose which mailbox to search (*'Service Requests' / 'Service Requests DONE', 'INBOX', etc.*)
-	[X] Choose which email account to log in as (currently hardcoded)
-[X] Add comments to code
-[-] Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
+* [X] Add command line arguments to enable extra functionality:
+	* [X] Create new in-sheet for a single job number
+	* [X] Choose which mailbox to search (*'Service Requests' / 'Service Requests DONE', 'INBOX', etc.*)
+	* [X] Choose which email account to log in as (currently hardcoded)
+* [X] Add comments to code
+* [-] Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
