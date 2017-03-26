@@ -36,4 +36,4 @@ insheet.py -u johnsmith -j 703803 -f sd
 	* [X] Choose which mailbox to search (*'Service Requests' / 'Service Requests DONE', 'INBOX', etc.*)
 	* [X] Choose which email account to log in as (currently hardcoded)
 * [X] Add comments to code
-* [-] Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
+* [ ] Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
