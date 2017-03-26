@@ -103,9 +103,10 @@ def main(argv):
 	SERVER = "outlook.office365.com"
 	USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
 	JOB_NO = 0
+	FOLDER = "Service Requests"
 
 	try:
-		opts, args = getopt.getopt(argv, "u:j:h")
+		opts, args = getopt.getopt(argv, "u:j:f:h")
 	except getopt.GetoptError:
 		print "insheet.py [-u <username>] [-j <job number>]"
 
@@ -117,8 +118,20 @@ def main(argv):
 			JOB_NO = arg
 		elif opt == "-u":
 			USER = arg + "@compnow.com.au/servicevic@compnow.com.au"
+		elif opt == "-f":
+			FOLDER = arg
+
+	if FOLDER == "s":
+		FOLDER = "Service Requests"
+	elif FOLDER == "sd":
+		FOLDER = "Service Requests DONE"
+	elif FOLDER == "i":
+		FOLDER = "INBOX"
+	else:
+		print "Error: mailbox not recognised."
 
 	print "Job Number:", JOB_NO
+	print "Mailbox:", FOLDER
 	print "Username:", USER
 	PASS = getpass.getpass()
 
