@@ -3,29 +3,6 @@ Scrapes inbox for web service requests and pulls all the data.
 Using a HTML template (*template.html*), a new HTML document is populated with the scraped data from the email.
 The HTML is then converted to PDF using **weasyprint**.
 
-
-## Requirements:
-
-### Use pip to install:
-
-#### weasyprint
-```bash
-pip install weasyprint
-```
-### Use HomeBrew to install:
-
-#### cairo
-
-```bash
-brew install cairo
-```
-
-#### pango
-
-```bash
-brew install pango
-````
-
 ## Instructions:
 
 ### Usage
@@ -54,18 +31,9 @@ insheet.py -u johnsmith -j 703803 -f sd
 
 ## To Do:
 
-<<<<<<< HEAD
 [X] Add command line arguments to enable extra functionality:
 	[X] Create new in-sheet for a single job number
 	[X] Choose which mailbox to search (*'Service Requests' / 'Service Requests DONE', 'INBOX', etc.*)
 	[X] Choose which email account to log in as (currently hardcoded)
 [X] Add comments to code
 [-] Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
-=======
-* Add command line arguments to enable extra functionality:
-	* ~~Create new in-sheet for a single job number~~
-	* Choose which mailbox to search (*'Service Requests' / 'Service Requests DONE', 'INBOX', etc.*)
-	* ~~Choose which email account to log in as (currently hardcoded)~~
-* ~~Add comments to code~~
-* Add error handling (e.g. incorrect password, errors with scraping, errors if job number not found, etc.)
->>>>>>> 26cebfab77cb79a9c438f152ee379a79b77f18e1
