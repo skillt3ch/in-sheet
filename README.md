@@ -18,7 +18,7 @@ Username is just the first half of your email address **username**@company.com
 If no job number is given, all emails will be scraped and returned.
 If job number is provided, only the email containing that job number will be returned.
 
-Options for -f:
+* Options for -f:
 	* s = "Service Requests" (default)
 	* sd = "Service Requests Done"
 	* i = "INBOX"
