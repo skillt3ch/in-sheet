@@ -103,7 +103,7 @@ def main(argv):
 	SERVER = "outlook.office365.com"
 	USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
 	JOB_NO = 0
-	FOLDER = "Service Requests"
+	FOLDER = "s"
 
 	try:
 		opts, args = getopt.getopt(argv, "u:j:f:h")
