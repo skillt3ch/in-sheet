@@ -115,6 +115,7 @@ folder options: s|sd|i
 		opts, args = getopt.getopt(argv, "u:j:f:h")
 	except getopt.GetoptError:
 		print HELP
+		sys.exit()
 
 	for opt, arg in opts:
 		if opt == "-h":
