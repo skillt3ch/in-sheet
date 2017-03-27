@@ -110,6 +110,16 @@
             #job-number {
                 padding: 20px 0px;
             }
+
+            #white {
+                color: #ffffff;
+            }
+
+            .big {
+                margin: 0;
+                padding-bottom: 12px;
+                font-size: 50px;
+            }
             
             .padded {
                 text-align: left;
@@ -134,7 +144,7 @@
                         <img src="http://services.compnow.com.au/customer_portal/email/img/compnow_square.png" alt="CompNow Logo" />
                     </div>
                     <div class="col-5" id="job-number">
-                        <h1>Service Request No: $REQ$</h1>
+                        <h1>Service Request No: <span id="white">$REQ$</span></h1>
                     </div>
                 </div>
             </div>
@@ -158,7 +168,7 @@
                         <h2 class="padded">$CONTACT$</h2>
                     </div>
                     <div class="col-2 center">
-                        <h2>$REQ$</h2>
+                        <h2 class="big" id="white">$REQ$</h2>
                         <h2 id="barcode">*$REQ$*</h2>
                     </div>
                 </div>            
