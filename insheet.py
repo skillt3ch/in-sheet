@@ -104,15 +104,21 @@ def main(argv):
 	USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
 	JOB_NO = 0
 	FOLDER = "s"
+	HELP = """insheet.py [-u <username>] [-j <job number>] [-f <folder>]
+folder options: s|sd|i
+\ts:\t'Service Requests'
+\tsd:\t'Service Requests DONE'
+\ti:\t'INBOX'
+"""
 
 	try:
 		opts, args = getopt.getopt(argv, "u:j:f:h")
 	except getopt.GetoptError:
-		print "insheet.py [-u <username>] [-j <job number>]"
+		print HELP
 
 	for opt, arg in opts:
 		if opt == "-h":
-			print "insheet.py [-u <username>] [-j <job number>]"
+			print HELP
 			sys.exit()
 		elif opt == "-j":
 			JOB_NO = arg
@@ -129,6 +135,7 @@ def main(argv):
 		FOLDER = "INBOX"
 	else:
 		print "Error: mailbox not recognised."
+		sys.exit()
 
 	print "Job Number:", JOB_NO
 	print "Mailbox:", FOLDER
@@ -137,18 +144,23 @@ def main(argv):
 
 	TEMPLATE = "template.html"
 
-	mail = imaplib.IMAP4_SSL(SERVER)
-	mail.login(USER, PASS)
+	try:
 
-	status, count = mail.select(FOLDER)
+		mail = imaplib.IMAP4_SSL(SERVER)
+		mail.login(USER, PASS)
 
-	if JOB_NO == 0:
-		result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
-	else:
-		result, data = mail.uid('search', None, '(BODY "Request No: %s")' % JOB_NO)
+		status, count = mail.select(FOLDER)
 
-	id_list = data[0].split()
-	# latest_email_id = id_list[-1]
+		if JOB_NO == 0:
+			result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
+		else:
+			result, data = mail.uid('search', None, '(BODY "Request No: %s")' % JOB_NO)
+
+		id_list = data[0].split()
+		# latest_email_id = id_list[-1]
+	except Exception as e:
+		print 'Error: %s' % e
+		sys.exit()
 
 	for uid in id_list:
 
@@ -175,6 +187,7 @@ def main(argv):
 
 		except Exception as e:
 			print 'Error: %s' % e
+			sys.exit()
 
 
 main(sys.argv[1:])
