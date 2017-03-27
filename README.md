@@ -20,7 +20,7 @@ If job number is provided, only the email containing that job number will be ret
 
 * Options for -f:
 	* s = "Service Requests" (default)
-	* sd = "Service Requests Done"
+	* sd = "Service Requests DONE"
 	* i = "INBOX"
 
 e.g.
