@@ -140,7 +140,7 @@ def main(argv):
 	mail = imaplib.IMAP4_SSL(SERVER)
 	mail.login(USER, PASS)
 
-	status, count = mail.select("Service Requests")
+	status, count = mail.select(FOLDER)
 
 	if JOB_NO == 0:
 		result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
