@@ -5,6 +5,13 @@ The HTML is then converted to PDF using **weasyprint**.
 
 ## Instructions:
 
+### Requirements
+
+Run the following:
+```bash
+pip install -r requirements.txt
+```
+
 ### Usage
 
 ```bash
