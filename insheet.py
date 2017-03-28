@@ -11,9 +11,10 @@ import getopt
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-# note that if you want to get text content (body) and the email contains
-# multiple payloads (plaintext/ html), you must parse each message separately.
-# use something like the following: (taken from a stackoverflow post)
+"""
+If the email contains multiple payloads (plaintext/html), you must parse each
+message separately to get the text content (body)
+"""
 def get_first_text_block(email_message_instance):
     maintype = email_message_instance.get_content_maintype()
     if maintype == 'multipart':
@@ -23,6 +24,10 @@ def get_first_text_block(email_message_instance):
     elif maintype == 'text':
         return email_message_instance.get_payload(decode=True)
 
+"""
+Using the body of the current email, scrape the search result
+by traversing specific HTML tags which are present in the current format.
+"""
 def get_val(source, search):
 	 i = source.find(search)
 	 new_msg = source[i:]
@@ -32,6 +37,10 @@ def get_val(source, search):
 
 	 return unicode(new_msg[start:end].strip(), errors='replace')
 
+"""
+Using the mail object and the current email's UID,
+scrape all the data and return a new object
+"""
 def scrape_data(mail, uid):
 	result, data = mail.uid('fetch', uid, '(RFC822)')
 	raw_email = data[0][1]
@@ -96,14 +105,12 @@ def scrape_data(mail, uid):
 	return scraped
 
 def main(argv):
-
-	#print "Number of arguments: %s" % len(argv)
-	#print "Arguments: %s" % str(argv)
-
+    # Initialise variables
 	SERVER = "outlook.office365.com"
 	USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
 	JOB_NO = 0
 	FOLDER = "s"
+    TEMPLATE = "template.html"
 	HELP = """insheet.py [-u <username>] [-j <job number>] [-f <folder>]
 folder options: s|sd|i
 \ts:\t'Service Requests'
@@ -111,12 +118,14 @@ folder options: s|sd|i
 \ti:\t'INBOX'
 """
 
+    # Parse the arguments
 	try:
 		opts, args = getopt.getopt(argv, "u:j:f:h")
 	except getopt.GetoptError:
 		print HELP
 		sys.exit()
 
+    # Get all the options/flags
 	for opt, arg in opts:
 		if opt == "-h":
 			print HELP
@@ -143,52 +152,52 @@ folder options: s|sd|i
 	print "Username:", USER
 	PASS = getpass.getpass()
 
-	TEMPLATE = "template.html"
-
 	try:
-
+        # Log into mail server with username and password
 		mail = imaplib.IMAP4_SSL(SERVER)
 		mail.login(USER, PASS)
 
+        # Connect to FOLDER
 		status, count = mail.select(FOLDER)
 
+        # If we didn't pass in a specific job number, just go through all emails which
+        # contain the Subject: Hardware Service Booking
 		if JOB_NO == 0:
 			result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
+        # If we passed in a specific job number, then search the emails only for that email.
 		else:
 			result, data = mail.uid('search', None, '(BODY "Request No: %s")' % JOB_NO)
 
+        # Create array/list of emails which match our search query.
 		id_list = data[0].split()
-		# latest_email_id = id_list[-1]
 	except Exception as e:
 		print 'Error: %s' % e
 		sys.exit()
 
+    # Iterate through list of emails
 	for uid in id_list:
-
 		try:
+            # Scrape current email and save data in new object
 			scraped = scrape_data(mail, uid)
 
+            # Open the HTML template and store it as a string
 			with open(TEMPLATE, 'r') as htmlFile:
 				html = htmlFile.read()
 
+            # Replace all occurrences of special placeholder strings with our scraped data
 			html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
 
+            # Convert to PDF document
 			doc = weasyprint.HTML(string=html)
 			pdf = doc.write_pdf()
 
 			with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
 				pdfFile.write(pdf)
 
-			#pdfkit.from_string(html, '%s-in.pdf' % scraped['REQ'], options=options)
-
-			#with open('Call - %s.html' % scraped['REQ'], 'w') as file:
-			#	file.write(html)
-
 			print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % scraped['REQ'], '*'*40, '\n'
 
 		except Exception as e:
 			print 'Error: %s' % e
 			sys.exit()
-
 
 main(sys.argv[1:])
