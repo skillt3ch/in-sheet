@@ -7,6 +7,7 @@ import re
 import weasyprint
 import sys
 import getopt
+import os.path
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -34,13 +35,16 @@ by traversing specific HTML tags which are present in the current format.
 
 
 def get_val(source, search):
-     i = source.find(search)
-     new_msg = source[i:]
+    try:
+        i = source.find(search)
+        new_msg = source[i:]
 
-     start = new_msg.find('</b>') + 5
-     end = new_msg.find("</td>") - 1
+        start = new_msg.find('</b>') + 5
+        end = new_msg.find("</td>") - 1
 
-     return unicode(new_msg[start:end].strip(), errors='replace')
+        return unicode(new_msg[start:end].strip(), errors='replace')
+    except Exception as e:
+        print 'Error: %s' % e
 
 
 """
@@ -50,67 +54,90 @@ scrape all the data and return a new object
 
 
 def scrape_data(mail, uid):
-    result, data = mail.uid('fetch', uid, '(RFC822)')
-    raw_email = data[0][1]
+    try:
+        result, data = mail.uid('fetch', uid, '(RFC822)')
+        raw_email = data[0][1]
 
-    scraped = {}
+        scraped = {}
 
-    email_message = email.message_from_string(raw_email)
+        email_message = email.message_from_string(raw_email)
 
-    msg = get_first_text_block(email_message)
-    subject = email_message['Subject']
+        msg = get_first_text_block(email_message)
+        subject = email_message['Subject']
 
-    print '*' * 40, '\n', subject
+        print '*' * 40, '\n', subject
 
-    i = msg.find("No:")
-    scraped['REQ'] = msg[i + 4:i + 10]
+        i = msg.find("No:")
+        scraped['REQ'] = msg[i + 4:i + 10]
 
-    print 'Web Request No: %s' % scraped['REQ']
+        print 'Web Request No: %s' % scraped['REQ']
 
-    scraped['LOCATION'] = get_val(msg, "Location:")
-    scraped['ORG'] = get_val(msg, "Organisation:")
-    scraped['CONTACT'] = get_val(msg, "Contact:")
-    scraped['ADDRESS'] = get_val(msg, "Address:")
-    scraped['EMAIL'] = get_val(msg, "Email:")
-    scraped['CONTACT_NUM'] = get_val(msg, "Contact Number:")
-    scraped['MODEL'] = get_val(msg, "Model:")
-    scraped['SERIAL'] = get_val(msg, "Serial:")
-    scraped['EXTRA'] = get_val(msg, "Accessories:")
-    scraped['FAULT'] = get_val(msg, "Repair Required:")
-    scraped['DAMAGE'] = get_val(msg, "Damage:")
-    scraped['PREV_REPAIR'] = get_val(msg, "Repaired:")
-    scraped['BACKUP'] = get_val(msg, "Backup:")
-    scraped['FMI'] = get_val(msg, "Find My iPhone:")
-    scraped['REPAIR_TYPE'] = get_val(msg, "Repair Type:")
-    scraped['RETURN_GOODS'] = get_val(msg, "Return of Goods:")
-    scraped['AGREED'] = get_val(msg, "Service Terms:")
-    scraped['REQ_DATE_TIME'] = get_val(msg, "Time of Request:")
+        scraped['LOCATION'] = get_val(msg, "Location:")
+        scraped['ORG'] = get_val(msg, "Organisation:")
+        scraped['CONTACT'] = get_val(msg, "Contact:")
+        scraped['ADDRESS'] = get_val(msg, "Address:")
+        scraped['EMAIL'] = get_val(msg, "Email:")
+        scraped['CONTACT_NUM'] = get_val(msg, "Contact Number:")
+        scraped['MODEL'] = get_val(msg, "Model:")
+        scraped['SERIAL'] = get_val(msg, "Serial:")
+        scraped['EXTRA'] = get_val(msg, "Accessories:")
+        scraped['FAULT'] = get_val(msg, "Repair Required:")
+        scraped['DAMAGE'] = get_val(msg, "Damage:")
+        scraped['PREV_REPAIR'] = get_val(msg, "Repaired:")
+        scraped['BACKUP'] = get_val(msg, "Backup:")
+        scraped['FMI'] = get_val(msg, "Find My iPhone:")
+        scraped['REPAIR_TYPE'] = get_val(msg, "Repair Type:")
+        scraped['RETURN_GOODS'] = get_val(msg, "Return of Goods:")
+        scraped['AGREED'] = get_val(msg, "Service Terms:")
+        scraped['REQ_DATE_TIME'] = get_val(msg, "Time of Request:")
 
-    saved_data = ''
-    # saved_data += '<p><strong>Service Location</strong>: %s</p>' % LOCATION
-    saved_data += '<p><strong>Organisation</strong>: %s</p>' % scraped['ORG']
-    saved_data += '<p><strong>Contact</strong>: %s</p>' % scraped['CONTACT']
-    saved_data += '<p><strong>Address</strong>: %s</p>' % scraped['ADDRESS']
-    saved_data += '<p><strong>Email</strong>: %s</p>' % scraped['EMAIL']
-    saved_data += '<p><strong>Contact Number</strong>: %s</p>' % scraped['CONTACT_NUM']
-    saved_data += '<p><strong>Brand/Model</strong>: %s</p>' % scraped['MODEL']
-    saved_data += '<p><strong>Serial Number</strong>: %s</p>' % scraped['SERIAL']
-    saved_data += '<p><strong>Extra Accessories</strong>: %s</p>' % scraped['EXTRA']
-    saved_data += '<p><strong>Fault/Repair Required</strong>: %s</p>' % scraped['FAULT']
-    saved_data += '<p><strong>Visible Damage</strong>: %s</p>' % scraped['DAMAGE']
-    saved_data += '<p><strong>Previously Repaired</strong>: %s</p>' % scraped['PREV_REPAIR']
-    saved_data += '<p><strong>Data Backup</strong>: %s</p>' % scraped['BACKUP']
-    saved_data += '<p><strong>Find My iPhone</strong>: %s</p>' % scraped['FMI']
-    saved_data += '<p><strong>Service Repair Type</strong>: %s</p>' % scraped['REPAIR_TYPE']
-    saved_data += '<p><strong>Return of Goods</strong>: %s</p>' % scraped['RETURN_GOODS']
-    saved_data += '<p><strong>Agreed to Service Terms</strong>: %s</p>' % scraped['AGREED']
-    saved_data += '<p><strong>Date/Time of Request</strong>: %s</p>' % scraped['REQ_DATE_TIME']
+        saved_data = ''
+        # saved_data += '<p><strong>Service Location</strong>: %s</p>' % LOCATION
+        saved_data += '<p><strong>Organisation</strong>: %s</p>' % scraped['ORG']
+        saved_data += '<p><strong>Contact</strong>: %s</p>' % scraped['CONTACT']
+        saved_data += '<p><strong>Address</strong>: %s</p>' % scraped['ADDRESS']
+        saved_data += '<p><strong>Email</strong>: %s</p>' % scraped['EMAIL']
+        saved_data += '<p><strong>Contact Number</strong>: %s</p>' % scraped['CONTACT_NUM']
+        saved_data += '<p><strong>Brand/Model</strong>: %s</p>' % scraped['MODEL']
+        saved_data += '<p><strong>Serial Number</strong>: %s</p>' % scraped['SERIAL']
+        saved_data += '<p><strong>Extra Accessories</strong>: %s</p>' % scraped['EXTRA']
+        saved_data += '<p><strong>Fault/Repair Required</strong>: %s</p>' % scraped['FAULT']
+        saved_data += '<p><strong>Visible Damage</strong>: %s</p>' % scraped['DAMAGE']
+        saved_data += '<p><strong>Previously Repaired</strong>: %s</p>' % scraped['PREV_REPAIR']
+        saved_data += '<p><strong>Data Backup</strong>: %s</p>' % scraped['BACKUP']
+        saved_data += '<p><strong>Find My iPhone</strong>: %s</p>' % scraped['FMI']
+        saved_data += '<p><strong>Service Repair Type</strong>: %s</p>' % scraped['REPAIR_TYPE']
+        saved_data += '<p><strong>Return of Goods</strong>: %s</p>' % scraped['RETURN_GOODS']
+        saved_data += '<p><strong>Agreed to Service Terms</strong>: %s</p>' % scraped['AGREED']
+        saved_data += '<p><strong>Date/Time of Request</strong>: %s</p>' % scraped['REQ_DATE_TIME']
 
-    saved_data.replace("\\r\\n", "").replace("\\", "")
+        saved_data.replace("\\r\\n", "").replace("\\", "")
 
-    scraped['saved_data'] = saved_data
+        scraped['saved_data'] = saved_data
 
-    return scraped
+        return scraped
+
+    except Exception as e:
+        print 'Error: %s' % e
+
+
+def createPDF(pdf, req):
+    try:
+        if os.path.isfile('%s-in.pdf' % req):
+            print 'File %s-in.pdf already exists. Overwrite?' % req
+            response = raw_input("y/n: ")
+            if response.lower() == 'y' or response.lower() == 'yes':
+                with open('%s-in.pdf' % req, 'w') as pdfFile:
+                    pdfFile.write(pdf)
+                    print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % req, '*' * 40, '\n'
+            else:
+                print 'File not overwritten.'
+        else:
+            with open('%s-in.pdf' % req, 'w') as pdfFile:
+                pdfFile.write(pdf)
+            print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % req, '*' * 40, '\n'
+    except Exception as e:
+        print 'Error: %s' % e
 
 
 def main(argv):
@@ -173,10 +200,13 @@ folder options: s|sd|i
         # If we didn't pass in a specific job number, just go through all emails which
         # contain the Subject: Hardware Service Booking
         if JOB_NO == 0:
-            result, data = mail.uid('search', None, '(HEADER Subject "Hardware Service Booking")')
-        # If we passed in a specific job number, then search the emails only for that email.
+            result, data = mail.uid(
+                'search', None, '(HEADER Subject "Hardware Service Booking")')
+        # If we passed in a specific job number, then search the emails only
+        # for that email.
         else:
-            result, data = mail.uid('search', None, '(BODY "Request No: %s")' % JOB_NO)
+            result, data = mail.uid(
+                'search', None, '(BODY "Request No: %s")' % JOB_NO)
 
         # Create array/list of emails which match our search query.
         id_list = data[0].split()
@@ -194,20 +224,21 @@ folder options: s|sd|i
             with open(TEMPLATE, 'r') as htmlFile:
                 html = htmlFile.read()
 
-            # Replace all occurrences of special placeholder strings with our scraped data
-            html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace("$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
+            # Replace all occurrences of special placeholder strings with our
+            # scraped data
+            html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace(
+                "$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
 
             # Convert to PDF document
             doc = weasyprint.HTML(string=html)
             pdf = doc.write_pdf()
+            req = scraped['REQ']
 
-            with open('%s-in.pdf' % scraped['REQ'], 'w') as pdfFile:
-                pdfFile.write(pdf)
-
-            print '\nSuccessfully saved.\n\t>> %s-in.pdf\n' % scraped['REQ'], '*'*40, '\n'
+            createPDF(pdf, req)
 
         except Exception as e:
             print 'Error: %s' % e
             sys.exit()
+
 
 main(sys.argv[1:])
