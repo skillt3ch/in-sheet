@@ -147,7 +147,7 @@ def main(argv):
     USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
     TEMPLATE = "template.html"
     JOB_NO = 0
-    FOLDER = "s"
+    FOLDER = "sd"
     HELP = """insheet.py [-u <username>] [-j <job number>] [-f <folder>]
 folder options: s|sd|i
 \ts:\t'Service Requests'
@@ -187,7 +187,8 @@ folder options: s|sd|i
     print "Job Number:", JOB_NO
     print "Mailbox:", FOLDER
     print "Username:", USER
-    PASS = getpass.getpass()
+    #PASS = getpass.getpass()
+    PASS = "bLueivY7361"
 
     try:
         # Log into mail server with username and password
