@@ -12,6 +12,8 @@ import os.path
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+TEMPLATE = "template.html"
+
 """
 If the email contains multiple payloads (plaintext/html), you must parse each
 message separately to get the text content (body)
@@ -120,6 +122,73 @@ def scrape_data(mail, uid):
     except Exception as e:
         print 'Error: %s' % e
 
+def create_insheet():
+    try:
+        scraped = {}
+
+        print "Create new in-sheet"
+
+        scraped['REQ'] = raw_input("Job Number: ")
+        scraped['LOCATION'] = raw_input("Location: ")
+        scraped['ORG'] = raw_input("Organisation: ")
+        scraped['CONTACT'] = raw_input("Contact: ")
+        scraped['ADDRESS'] = raw_input("Address: ")
+        scraped['EMAIL'] = raw_input("Email: ")
+        scraped['CONTACT_NUM'] = raw_input("Contact Number: ")
+        scraped['MODEL'] = raw_input("Model: ")
+        scraped['SERIAL'] = raw_input("Serial: ").upper()
+        scraped['EXTRA'] = raw_input("Accessories: ")
+        scraped['FAULT'] = raw_input("Repair Required: ")
+        scraped['DAMAGE'] = raw_input("Damage: ")
+        scraped['PREV_REPAIR'] = raw_input("Repaired: ")
+        scraped['BACKUP'] = raw_input("Backup: ")
+        scraped['FMI'] = raw_input("Find My iPhone: ")
+        scraped['REPAIR_TYPE'] = raw_input("Repair Type: ")
+        scraped['RETURN_GOODS'] = raw_input("Return of Goods: ")
+        scraped['AGREED'] = raw_input("Service Terms: ")
+        scraped['REQ_DATE_TIME'] = raw_input("Time of Request: ")
+
+        saved_data = ''
+        # saved_data += '<p><strong>Service Location</strong>: %s</p>' % LOCATION
+        saved_data += '<p><strong>Organisation</strong>: %s</p>' % scraped['ORG']
+        saved_data += '<p><strong>Contact</strong>: %s</p>' % scraped['CONTACT']
+        saved_data += '<p><strong>Address</strong>: %s</p>' % scraped['ADDRESS']
+        saved_data += '<p><strong>Email</strong>: %s</p>' % scraped['EMAIL']
+        saved_data += '<p><strong>Contact Number</strong>: %s</p>' % scraped['CONTACT_NUM']
+        saved_data += '<p><strong>Brand/Model</strong>: %s</p>' % scraped['MODEL']
+        saved_data += '<p><strong>Serial Number</strong>: %s</p>' % scraped['SERIAL']
+        saved_data += '<p><strong>Extra Accessories</strong>: %s</p>' % scraped['EXTRA']
+        saved_data += '<p><strong>Fault/Repair Required</strong>: %s</p>' % scraped['FAULT']
+        saved_data += '<p><strong>Visible Damage</strong>: %s</p>' % scraped['DAMAGE']
+        saved_data += '<p><strong>Previously Repaired</strong>: %s</p>' % scraped['PREV_REPAIR']
+        saved_data += '<p><strong>Data Backup</strong>: %s</p>' % scraped['BACKUP']
+        saved_data += '<p><strong>Find My iPhone</strong>: %s</p>' % scraped['FMI']
+        saved_data += '<p><strong>Service Repair Type</strong>: %s</p>' % scraped['REPAIR_TYPE']
+        saved_data += '<p><strong>Return of Goods</strong>: %s</p>' % scraped['RETURN_GOODS']
+        saved_data += '<p><strong>Agreed to Service Terms</strong>: %s</p>' % scraped['AGREED']
+        saved_data += '<p><strong>Date/Time of Request</strong>: %s</p>' % scraped['REQ_DATE_TIME']
+
+        scraped['saved_data'] = saved_data
+
+        # Open the HTML template and store it as a string
+        with open(TEMPLATE, 'r') as htmlFile:
+            html = htmlFile.read()
+
+        # Replace all occurrences of special placeholder strings with our
+        # scraped data
+        html = html.replace("$REQ$", scraped['REQ']).replace("$CONTACT$", scraped['CONTACT']).replace(
+            "$ORG$", scraped['ORG']).replace("$DATA$", scraped['saved_data'])
+
+        # Convert to PDF document
+        doc = weasyprint.HTML(string=html)
+        pdf = doc.write_pdf()
+        req = scraped['REQ']
+
+        createPDF(pdf, req)
+
+    except Exception as e:
+        print 'Error: %s' % e
+
 
 def createPDF(pdf, req):
     try:
@@ -145,7 +214,7 @@ def main(argv):
     # Initialise variables
     SERVER = "outlook.office365.com"
     USER = "jonathan.vonkelaita@compnow.com.au/servicevic@compnow.com.au"
-    TEMPLATE = "template.html"
+
     JOB_NO = 0
     FOLDER = "sd"
     HELP = """insheet.py [-u <username>] [-j <job number>] [-f <folder>]
@@ -157,7 +226,7 @@ folder options: s|sd|i
 
     # Parse the arguments
     try:
-        opts, args = getopt.getopt(argv, "u:j:f:h")
+        opts, args = getopt.getopt(argv, "u:j:f:hc")
     except getopt.GetoptError:
         print HELP
         sys.exit()
@@ -173,6 +242,9 @@ folder options: s|sd|i
             USER = arg + "@compnow.com.au/servicevic@compnow.com.au"
         elif opt == "-f":
             FOLDER = arg
+        elif opt == "-c":
+            create_insheet()
+            sys.exit()
 
     if FOLDER == "s":
         FOLDER = "Service Requests"
