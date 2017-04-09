@@ -259,8 +259,7 @@ folder options: s|sd|i
     print "Job Number:", JOB_NO
     print "Mailbox:", FOLDER
     print "Username:", USER
-    #PASS = getpass.getpass()
-    PASS = "bLueivY7361"
+    PASS = getpass.getpass()
 
     try:
         # Log into mail server with username and password
